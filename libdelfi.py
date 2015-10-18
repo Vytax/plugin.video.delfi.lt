@@ -81,7 +81,7 @@ class Delfi(object):
 
   def getLatestVideos(self, page):
     
-    videos = []
+    result = {}
     
     now = datetime.now()
     last = now - timedelta(days=180)
@@ -93,10 +93,12 @@ class Delfi(object):
     body = re.findall('<div class="dblock-wrapper">(.*?)<div class="archive-paging">', html, re.DOTALL)
     
     if not body:
-      return videos
+      return result
     
     videoItems = re.findall('<div class="block-224.*?<img src="([^"]*)".*?<span class="block-length"><i>\s*(\d+:\d+)\s*</i>.*?<h3 class="video-title">.*?id=(\d+)">([^<]*)</a', body[0], re.DOTALL)
-      
+    
+    videos = []
+    
     for item in videoItems:
       
       video = {}
@@ -113,8 +115,13 @@ class Delfi(object):
       video['aired'] = extraData['aired']
 	
       videos.append(video)
-      
-    return videos
+    
+    result['data'] = videos
+    
+    pages = self.getPageCount(html)    
+    result.update(pages)
+    
+    return result
 
   def getArticle(self, mid):
     
@@ -228,11 +235,33 @@ class Delfi(object):
       return True
     else:
       return False
+    
+  def getPageCount(self, html):
+    
+    paging = re.findall('<div class="archive-paging">(.*?)</div>', html, re.DOTALL)
+    
+    if not paging:
+      return False
+           
+    pages = re.findall('<a class="item item-num( item-active|)[^>]*>(\d*)<\/a>', paging[0], re.DOTALL)
+    
+    currentPage = 1
+    for page in pages:
+      if page[0]:
+	currentPage = int(page[1])
+	break
+      
+    pageCount = int(pages[-1][1])  
+    return { 'currentPage' : currentPage, 'pageCount' : pageCount }
+    
+   
 
 if __name__ == '__main__':
   
   delfi = Delfi('test.sql')
   
-  print delfi.getArticleCached(69290496)
-  delfi.isBadVideo(100)
+ # print delfi.getArticleCached(69290496)
+ # delfi.isBadVideo(100)
  # print longDateToShort('2015 m. spalio 9 d. 20:00')
+ 
+  delfi.getPageCount(delfi.getURL('http://www.delfi.lt/video/archive/?fromd=16.09.2015&tod=16.10.2015&channel=107&page=5'))

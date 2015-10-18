@@ -38,7 +38,12 @@ def build_media_list(page):
 
   tvList = delfi.getLatestVideos(page)
   
-  for tv in tvList:
+  if 'data' in tvList:
+    data = tvList['data']
+  else:
+    data = []
+  
+  for tv in data:
     listitem = xbmcgui.ListItem(tv['title'])
     listitem.setProperty('IsPlayable', 'true')
       
@@ -64,10 +69,19 @@ def build_media_list(page):
     u['thumbnailURL'] = tv['thumbnailURL']
       
     xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?' + urllib.urlencode(u), listitem = listitem, isFolder = False, totalItems = 0)
+  
+  if 'currentPage' in tvList and 'pageCount' in tvList:
     
-  listitem = xbmcgui.ListItem("[Daugiau... ]")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=1&page=' + str(page + 1), listitem = listitem, isFolder = True, totalItems = 0)
+    currentPage = tvList['currentPage']
+    pageCount = tvList['pageCount']
+    
+    print currentPage
+    print pageCount
+    
+    if currentPage < pageCount:    
+      listitem = xbmcgui.ListItem("[Daugiau... ] %d/%d" % (currentPage, pageCount))
+      listitem.setProperty('IsPlayable', 'false')
+      xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=1&page=' + str(page + 1), listitem = listitem, isFolder = True, totalItems = 0)
   
   xbmcplugin.setContent(int( sys.argv[1] ), 'tvshows')
   xbmc.executebuiltin('Container.SetViewMode(503)')
