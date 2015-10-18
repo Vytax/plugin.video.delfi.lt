@@ -191,7 +191,7 @@ class Delfi(object):
 
   def longDateToShort(self, longDate):
     
-    parts = re.findall('(\d+) m. (\w+) (\d+) d\.', longDate)
+    parts = re.findall('(\d+)\s*m.\s*(\w+)\s*(\d+)\s*d\.', longDate)
     
     if not parts:
       return ''
@@ -260,8 +260,8 @@ if __name__ == '__main__':
   
   delfi = Delfi('test.sql')
   
- # print delfi.getArticleCached(69290496)
+  print delfi.getArticle(69240274)
  # delfi.isBadVideo(100)
  # print longDateToShort('2015 m. spalio 9 d. 20:00')
  
-  delfi.getPageCount(delfi.getURL('http://www.delfi.lt/video/archive/?fromd=16.09.2015&tod=16.10.2015&channel=107&page=5'))
+ # delfi.getPageCount(delfi.getURL('http://www.delfi.lt/video/archive/?fromd=16.09.2015&tod=16.10.2015&channel=107&page=5'))
