@@ -204,7 +204,7 @@ class Delfi(object):
 
   def longDateToShort(self, longDate):
     
-    parts = re.findall('(\d+)\s*m.\s*(\w+)\s*(\d+)\s*d\.', longDate)
+    parts = re.findall('(\d+)\s*m.\s*([a-zA-Zžėščū]+)\s*(\d+)\s*d\.', longDate, re.UNICODE)
     
     if not parts:
       return ''
