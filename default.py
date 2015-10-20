@@ -30,13 +30,25 @@ def build_main_directory():
   listitem.setProperty('IsPlayable', 'false')
   xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=1&page=1', listitem = listitem, isFolder = True, totalItems = 0)
   
+  listitem = xbmcgui.ListItem("Sporto TV")
+  listitem.setProperty('IsPlayable', 'false')
+  listitem.setThumbnailImage('http://g4.dcdn.lt/vd/i/sporto-tv/logo.png')
+  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=3', listitem = listitem, isFolder = True, totalItems = 0)
+  
   xbmcplugin.setContent(int( sys.argv[1] ), 'tvshows')
   xbmc.executebuiltin('Container.SetViewMode(515)')
   xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-def build_media_list(page):
+def build_media_list(mode, page):
 
-  tvList = delfi.getLatestVideos(page)
+  tvList = {}
+  
+  if mode == 1:
+    tvList = delfi.getLatestVideos(page)
+  elif mode == 4:
+    tvList = delfi.getSportsTVReports(page)
+  else:
+    return
   
   if 'data' in tvList:
     data = tvList['data']
@@ -81,10 +93,24 @@ def build_media_list(page):
     if currentPage < pageCount:    
       listitem = xbmcgui.ListItem("[Daugiau... ] %d/%d" % (currentPage, pageCount))
       listitem.setProperty('IsPlayable', 'false')
-      xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=1&page=' + str(page + 1), listitem = listitem, isFolder = True, totalItems = 0)
+      xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=' + str(mode) + '&page=' + str(page + 1), listitem = listitem, isFolder = True, totalItems = 0)
   
   xbmcplugin.setContent(int( sys.argv[1] ), 'tvshows')
   xbmc.executebuiltin('Container.SetViewMode(503)')
+  xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+def build_sporto_tv():
+  
+  listitem = xbmcgui.ListItem("Reportažai")
+  listitem.setProperty('IsPlayable', 'false')
+  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=4&page=1', listitem = listitem, isFolder = True, totalItems = 0)
+  
+  listitem = xbmcgui.ListItem("Rungtynių įrašai")
+  listitem.setProperty('IsPlayable', 'false')
+  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=5&page=1', listitem = listitem, isFolder = True, totalItems = 0)
+  
+  xbmcplugin.setContent(int( sys.argv[1] ), 'tvshows')
+  xbmc.executebuiltin('Container.SetViewMode(515)')
   xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def playVideo(mediaId, thumbnailURL):
@@ -145,8 +171,10 @@ except:
 
 if mode == None:
   build_main_directory()
-elif mode == 1:
-  build_media_list(page)
+elif mode in [1, 4]:
+  build_media_list(mode, page)
 elif mode == 2:
   playVideo(mediaId, thumbnailURL)
+elif mode == 3:
+  build_sporto_tv()
   

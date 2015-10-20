@@ -79,15 +79,28 @@ class Delfi(object):
     
     return int(parts[0])*60+int(parts[1])
 
-  def getLatestVideos(self, page):
-    
-    result = {}
-    
+  def getLatestVideos(self, page):    
+       
     now = datetime.now()
     last = now - timedelta(days=180)
     
     url = DELFI_TV_ARCHIVE % (last.strftime('%d.%m.%Y'), now.strftime('%d.%m.%Y'), page)
     
+    return self.getInfo(url)
+  
+  def getSportsTVReports(self, page):
+    
+    now = datetime.now()
+    last = now - timedelta(days=500)
+    
+    url = DELFI_TV_ARCHIVE % (last.strftime('%d.%m.%Y'), now.strftime('%d.%m.%Y'), page)
+    
+    return self.getInfo(url + '&category=65179417')
+  
+  def getInfo(self, url):
+  
+    result = {}
+  
     html = self.getURL(url)
     
     body = re.findall('<div class="dblock-wrapper">(.*?)<div class="archive-paging">', html, re.DOTALL)
