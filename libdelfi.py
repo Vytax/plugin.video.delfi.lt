@@ -36,41 +36,6 @@ class Delfi(object):
     res = urllib.urlopen(url)
     return res.read()
 
-  def getChannels(self):
-  
-    html = self.getURL(DELFI_TV_URL)
-    urls = re.findall('<li class="(?:nav-0-(active|live) |)nav"><a href="http:\/\/www\.delfi\.lt\/video\/([A-Za-z0-9-]+)[/]*">(.*?)</a></li>', html, re.DOTALL)
-  
-    channelsList = []
-  
-    for url in urls:
-    
-      channel = {}
-    
-      mType = url[0]
-      if mType != 'live':
-	mType = 'standart'
-    
-      channel['type'] = mType
-    
-      channel['url'] = 'http://www.delfi.lt/video/' + url[1]
-    
-      title = url[2]
-    
-      img = re.findall('<img src="[^"]*" alt="([^"]*)" />', title, re.DOTALL)
-      if img:
-	alt = img[0]
-	if alt in DELFI_ALT_TITLES:
-	  title = DELFI_ALT_TITLES[alt]
-	else:
-	  title = alt
-    
-      channel['title'] = title
-    
-      channelsList.append(channel)
-    
-    return channelsList
-
   def str_duration_to_int(self, duration):
     
     parts = duration.split(':')
