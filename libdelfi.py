@@ -68,35 +68,61 @@ class Delfi(object):
   
     html = self.getURL(url)
     
-    body = re.findall('<div class="dblock-wrapper">(.*?)<div class="archive-paging">', html, re.DOTALL)
+    videoItems = re.findall('<div class="headline">(.*?)<div class="cb">', html, re.DOTALL)
     
-    if not body:
-      return result
-    
-    videoItems = re.findall('<div class="block-224.*?<img src="([^"]*)".*?<span class="block-length"><i>\s*(\d+:\d+)\s*</i>.*?<h3 class="video-title">.*?id=(\d+)">([^<]*)</a', body[0], re.DOTALL)
-    
+    if not videoItems:
+      return result    
+ 
     videos = []
     
     for item in videoItems:
       
       video = {}
-      video['thumbnailURL'] = item[0]
-      video['duration'] = self.str_duration_to_int(item[1])
-      video['id'] = item[2]
-      video['title'] = item[3].replace('\t','').strip()
       
-      extraData = self.getArticleCached(int(video['id']))
-      if not extraData:
+      thumb = re.findall('<img class="img-responsive" src="([^"]*)"', item, re.DOTALL)
+      if thumb:	    
+	video['thumbnailURL'] = thumb[0]
+      else:
+	video['thumbnailURL'] = ''
+      
+      mId = re.findall('\?id=(\d*)', item, re.DOTALL)      
+      if mId:
+	video['id'] = mId[0]
+      else:
 	continue
+      
+      title = re.findall('<h3 class="headline-title">\s*<a[^>]*>(.*?)<\/a>', item, re.DOTALL) 
+      if title:
+	video['title'] = title[0].replace('\t','').strip()
+      else:
+	continue      
+      
+      plot = re.findall('<div class="headline-lead hidden-xs">\s*<a[^>]*>(.*?)<\/a><\/div>', item, re.DOTALL)
+      if plot:
+	plot =  re.sub(r'<[^>]*?>', '', plot[0])
+	video['plot'] = plot.replace('\t','').strip()
+      else:
+	video['plot'] = ''
 	
-      video['plot'] = extraData['plot']
-      video['aired'] = extraData['aired']
-	
+      pubtime = re.findall('<div class="headline-pubtime">(\d+) (val|d).</div>', item, re.DOTALL)
+      if pubtime:
+	pubtime = pubtime[0]
+	t = datetime.now()
+	if pubtime[1] == 'd':
+	  t = t - timedelta(days=int(pubtime[0]))
+	elif pubtime[1] == 'val':
+	  t = t - timedelta(hours=int(pubtime[0]))
+	else:
+	  t = None
+	  
+	if t:
+	  video['aired'] = t.strftime('%Y.%m.%d.')
+      
       videos.append(video)
     
     result['data'] = videos
     
-    pages = self.getPageCount(html)    
+    pages = self.getPageCount(html)
     result.update(pages)
     
     return result
@@ -216,7 +242,7 @@ class Delfi(object):
     
   def getPageCount(self, html):
     
-    paging = re.findall('<div class="archive-paging">(.*?)</div>', html, re.DOTALL)
+    paging = re.findall('<div class="paging">(.*?)</div>', html, re.DOTALL)
     
     if not paging:
       return False
@@ -238,8 +264,4 @@ if __name__ == '__main__':
   
   delfi = Delfi('test.sql')
   
-  print delfi.getArticle(69240274)
- # delfi.isBadVideo(100)
- # print longDateToShort('2015 m. spalio 9 d. 20:00')
- 
- # delfi.getPageCount(delfi.getURL('http://www.delfi.lt/video/archive/?fromd=16.09.2015&tod=16.10.2015&channel=107&page=5'))
+  delfi.getLatestVideos(1)
