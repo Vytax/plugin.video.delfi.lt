@@ -11,14 +11,7 @@ DELFI_TV = 'http://www.delfi.lt/'
 DELFI_TV_URL = DELFI_TV + 'video/'
 DELFI_TV_ARCHIVE = DELFI_TV_URL + 'archive/?fromd=%s&tod=%s&page=%d'
 DELFI_TV_ARTICLE = 'http://m.delfi.lt/video/article.php?id=%d'
-
-DELFI_ALT_TITLES = {
-  '1000-receptu' : '1000 receptų TV',
-  'Cosmopolitan' : 'Cosmopolitan TV',
-  'Manonamai'    : 'Mano Namai TV',
-  'Perpasauli TV': 'Per pasaulį TV',
-  'SportoTV'     : 'Sporto TV'
-  }
+DELFI_TV_SPORTAS = DELFI_TV_URL + 'sportas/?page=%d'
 
 reload(sys) 
 sys.setdefaultencoding('utf8')
@@ -55,12 +48,7 @@ class Delfi(object):
   
   def getSportsTVReports(self, page):
     
-    now = datetime.now()
-    last = now - timedelta(days=500)
-    
-    url = DELFI_TV_ARCHIVE % (last.strftime('%d.%m.%Y'), now.strftime('%d.%m.%Y'), page)
-    
-    return self.getInfo(url + '&category=65179417')
+    return self.getInfo(DELFI_TV_SPORTAS % page)
   
   def getInfo(self, url):
   
@@ -139,16 +127,19 @@ class Delfi(object):
     data_description = re.findall('<p itemprop="description"[^>]*>(.*?)<\/p>', html, re.DOTALL)
     
     if not data_id:
+      err = re.findall('div class="time-overlay">(.*?)<\/div>', html, re.DOTALL)
+      err = re.sub(r'<[^>]*?>', '', err[0])
+      result['error'] = err.replace('\t','').strip()
       print 'klaida: ' + str(mid)
-      self.badVideo(mid)
       return result
+    
     data_id = data_id[0]
     
     result['data_id'] = data_id
     result['videoURL'] = 'http://g.dcdn.lt/vs/videos/%s/%s/v480.mp4' % (data_id [0],  data_id)
     
     if data_description:
-      description = re.sub(r'<[^>]*?>', '', data_description[0])
+      description = re.sub(r'<[^>]*?>', ' ', data_description[0])
       result['plot'] = description.replace('\t','').strip()
     else:
       result['plot'] = ''

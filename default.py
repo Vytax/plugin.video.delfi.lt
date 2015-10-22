@@ -115,11 +115,14 @@ def build_sporto_tv():
 
 def playVideo(mediaId, thumbnailURL):
   
-  data = delfi.getArticleCached(mediaId)
+  data = delfi.getArticle(mediaId)
   
-  if not data:
+  if 'data_id' not in data:
     dialog = xbmcgui.Dialog()
-    ok = dialog.ok( "DELFI" , 'Nepavyko paleisti vaizdo įrašo!' )
+    if 'error' in data:
+      ok = dialog.ok( "DELFI TV" , data['error'] )
+    else:
+      ok = dialog.ok( "DELFI TV" , 'Nepavyko paleisti vaizdo įrašo!' )
     return
     
   listitem = xbmcgui.ListItem(label = data['title'])
