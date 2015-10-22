@@ -149,28 +149,35 @@ class Delfi(object):
     
     html = self.getURL(DELFI_TV_ARTICLE % mid)
     
-    data_id = re.findall('data-provider="dvideo" data-id="([^"]*)">', html, re.DOTALL)    
-    
-    if not data_id:
-      err = re.findall('div class="time-overlay">(.*?)<\/div>', html, re.DOTALL)
-      err = re.sub(r'<[^>]*?>', '', err[0])
-      result['error'] = err.replace('\t','').strip()
-      print 'klaida: ' + str(mid)
-      return result
-    
-    data_id = data_id[0]    
-    result['data_id'] = data_id
-    
-    videoData = self.getVideoData(data_id)
-    
-    if 'videoURL' in videoData:
-      result['videoURL'] = videoData['videoURL']
-    else:    
-      result['videoURL'] = 'http://g.dcdn.lt/vs/videos/%s/%s/v480.mp4' % (data_id [0],  data_id)
+    data_id = re.findall('data-provider="dvideo" data-id="([^"]*)">', html, re.DOTALL)
     
     metaItems = re.findall('<meta\s+(?:itemprop|property)\s*=\s*"([^"]*)"\s*content\s*=\s*"([^"]*)"\s*\/>', html, re.DOTALL)
     meta = self.arrayToHash(metaItems)
-    print meta
+    
+    if data_id:
+      data_id = data_id[0]    
+      result['data_id'] = data_id
+      
+      videoData = self.getVideoData(data_id)
+      
+      if 'videoURL' in videoData:
+	result['videoURL'] = videoData['videoURL']
+      elif 'contentUrl' in meta:
+	result['videoURL'] = meta['contentUrl']
+      else:    
+	result['videoURL'] = 'http://g.dcdn.lt/vs/videos/%s/%s/v480.mp4' % (data_id [0],  data_id)
+    
+    else:
+      data_hls = re.findall('data-hls="([^"]+)"', html, re.DOTALL)
+      if data_hls:
+	result['videoURL'] = data_hls[0]
+	
+      else:      
+	err = re.findall('div class="time-overlay">(.*?)<\/div>', html, re.DOTALL)
+	err = re.sub(r'<[^>]*?>', '', err[0])
+	result['error'] = err.replace('\t','').strip()
+	print 'klaida: ' + str(mid)
+	return result
     
     if 'description' in meta:
       result['plot'] = meta['description'].replace('\t',' ').strip()
@@ -262,4 +269,4 @@ if __name__ == '__main__':
   
   delfi = Delfi('test.sql')
   
-  print delfi.getArticle(69346534)
+  print delfi.getArticle(69336302)

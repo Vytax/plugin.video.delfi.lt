@@ -116,7 +116,7 @@ def playVideo(mediaId):
   
   data = delfi.getArticle(mediaId)
   
-  if 'data_id' not in data:
+  if 'videoURL' not in data:
     dialog = xbmcgui.Dialog()
     if 'error' in data:
       ok = dialog.ok( "DELFI TV" , data['error'] )
