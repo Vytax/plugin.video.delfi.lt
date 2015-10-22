@@ -172,12 +172,19 @@ class Delfi(object):
       if data_hls:
 	result['videoURL'] = data_hls[0]
 	
-      else:      
-	err = re.findall('div class="time-overlay">(.*?)<\/div>', html, re.DOTALL)
-	err = re.sub(r'<[^>]*?>', '', err[0])
-	result['error'] = err.replace('\t','').strip()
-	print 'klaida: ' + str(mid)
-	return result
+      else:
+	youtube = re.findall('<div id="youtube-([^"]+)"', html, re.DOTALL)
+	if youtube:
+	  result['videoURL'] = 'plugin://plugin.video.youtube/play/?video_id=' + youtube[0]
+	  
+	else:
+	  err = re.findall('div class="time-overlay">(.*?)<\/div>', html, re.DOTALL)	
+	  if err:
+	    err = re.sub(r'<[^>]*?>', '', err[0])
+	    result['error'] = err.replace('\t','').strip()
+	    
+	  print 'klaida: ' + str(mid)
+	  return result
     
     if 'description' in meta:
       result['plot'] = meta['description'].replace('\t',' ').strip()
@@ -269,4 +276,4 @@ if __name__ == '__main__':
   
   delfi = Delfi('test.sql')
   
-  print delfi.getArticle(69336302)
+  print delfi.getArticle(69336736)
