@@ -94,7 +94,7 @@ class Delfi(object):
       else:
 	video['plot'] = ''
 	
-      pubtime = re.findall('<div class="headline-pubtime">(\d+) (val|d).</div>', item, re.DOTALL)
+      pubtime = re.findall('<div class="headline-pubtime">(\d+) (val|d|min).</div>', item, re.DOTALL)
       if pubtime:
 	pubtime = pubtime[0]
 	t = datetime.now()
@@ -102,6 +102,8 @@ class Delfi(object):
 	  t = t - timedelta(days=int(pubtime[0]))
 	elif pubtime[1] == 'val':
 	  t = t - timedelta(hours=int(pubtime[0]))
+	elif pubtime[1] == 'min':
+	  t = t - timedelta(minutes=int(pubtime[0]))
 	else:
 	  t = None
 	  
