@@ -4,7 +4,6 @@
 import re
 import urllib
 import sys
-import sqlite3
 from datetime import datetime, timedelta
 import simplejson as json
 
@@ -19,12 +18,8 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 class Delfi(object):
-  def __init__(self, sqlfilename):
-    self._db = sqlite3.connect(sqlfilename)
-  
-    cursor = self._db.cursor()
-    cursor.execute('CREATE TABLE IF NOT EXISTS videos (mid INTEGER PRIMARY KEY, videoURL TEXT, plot TEXT, aired TEXT, title TEXT)')
-    cursor.execute('CREATE TABLE IF NOT EXISTS badVideos (mid INTEGER PRIMARY KEY, accessTime TEXT)')
+  def __init__(self):
+    pass
   
   def getURL(self, url):
   
@@ -205,53 +200,7 @@ class Delfi(object):
       result['thumbnailUrl'] = meta['thumbnailUrl']
 
     return result
-
-  def getArticleCached(self, mid):
-    
-    cursor = self._db.cursor()
-    
-    cursor.execute('SELECT videoURL, plot, aired, title FROM videos WHERE mid=?', (mid,))
-    row = cursor.fetchone()
-    
-    if row:      
-      result = {}
-      result['videoURL'] = row[0]
-      result['plot'] = row[1]
-      result['aired'] = row[2]
-      result['title'] = row[3]
-      return result
-    
-    else:
-      if self.isBadVideo(mid):
-	return {}
-      
-      data = self.getArticle(mid)
-      print data
-      if data: 
-	cursor.execute('INSERT INTO videos (mid, videoURL, plot, aired, title) VALUES (?,?,?,?,?)', (mid, data['videoURL'].decode('utf-8'), data['plot'].decode('utf-8'), data['aired'].decode('utf-8'), data['title'].decode('utf-8')))
-      
-	self._db.commit()
-      
-      return data
- 
-  def badVideo(self, mid):
-    cursor = self._db.cursor()
-    cursor.execute("REPLACE INTO badVideos (mid, accessTime) VALUES (?, DateTime('now'))", (mid,))
-    self._db.commit()
-    
-  def isBadVideo(self, mid):
-    cursor = self._db.cursor()
-    cursor.execute("DELETE FROM badVideos WHERE accessTime < DateTime('now', '-2 hours')")
-    self._db.commit()
-    
-    cursor.execute('SELECT * FROM badVideos WHERE mid=?', (mid,))
-    row = cursor.fetchone()
-    
-    if row:
-      return True
-    else:
-      return False
-    
+   
   def getPageCount(self, html):
     
     paging = re.findall('<div class="paging">(.*?)</div>', html, re.DOTALL)
@@ -274,6 +223,6 @@ class Delfi(object):
 
 if __name__ == '__main__':
   
-  delfi = Delfi('test.sql')
+  delfi = Delfi()
   
   print delfi.getArticle(69336736)

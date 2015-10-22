@@ -132,12 +132,8 @@ def playVideo(mediaId):
   
 
 # **************** main ****************
-tmpdir = os.path.join(settings.getAddonInfo( 'path' ), 'tmp');
 
-if not os.path.exists(tmpdir):
-    os.makedirs(tmpdir)
-
-delfi = Delfi(os.path.join(tmpdir,'cache.sql'))
+delfi = Delfi()
 
 path = sys.argv[0]
 params = getParameters(sys.argv[2])
