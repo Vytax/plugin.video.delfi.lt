@@ -126,7 +126,8 @@ def playVideo(mediaId):
     
   listitem = xbmcgui.ListItem(label = data['title'])
   listitem.setPath(data['videoURL'])
-  listitem.setThumbnailImage(data['thumbnailUrl'])
+  if 'thumbnailUrl' in data:
+    listitem.setThumbnailImage(data['thumbnailUrl'])
   xbmcplugin.setResolvedUrl(handle = int(sys.argv[1]), succeeded = True, listitem = listitem)	
   
 

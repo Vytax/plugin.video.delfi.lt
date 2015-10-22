@@ -6,12 +6,14 @@ import urllib
 import sys
 import sqlite3
 from datetime import datetime, timedelta
+import simplejson as json
 
 DELFI_TV = 'http://www.delfi.lt/'
 DELFI_TV_URL = DELFI_TV + 'video/'
 DELFI_TV_ARCHIVE = DELFI_TV_URL + 'archive/?fromd=%s&tod=%s&page=%d'
 DELFI_TV_ARTICLE = 'http://www.delfi.lt/video/article.php?id=%d'
 DELFI_TV_SPORTAS = DELFI_TV_URL + 'sportas/?page=%d'
+DELFI_VIDEO_DATA = 'http://g.dcdn.lt/vfe/data.php?video_id=%s'
 
 reload(sys) 
 sys.setdefaultencoding('utf8')
@@ -123,6 +125,21 @@ class Delfi(object):
       result[item[0]] = item[1]
       
     return result
+  
+  def getVideoData(self, vid):
+    
+    jsonData = self.getURL(DELFI_VIDEO_DATA % vid)
+    response = json.loads(jsonData)['data']
+    
+    result = {}
+    
+    if 'abr_playlist' in response:
+      url = response['abr_playlist']
+      if url.startswith('//'):
+	url = 'http:' + url
+      result['videoURL'] = url
+    
+    return result
 
   def getArticle(self, mid):
     
@@ -139,10 +156,15 @@ class Delfi(object):
       print 'klaida: ' + str(mid)
       return result
     
-    data_id = data_id[0]
-    
+    data_id = data_id[0]    
     result['data_id'] = data_id
-    result['videoURL'] = 'http://g.dcdn.lt/vs/videos/%s/%s/v480.mp4' % (data_id [0],  data_id)
+    
+    videoData = self.getVideoData(data_id)
+    
+    if 'videoURL' in videoData:
+      result['videoURL'] = videoData['videoURL']
+    else:    
+      result['videoURL'] = 'http://g.dcdn.lt/vs/videos/%s/%s/v480.mp4' % (data_id [0],  data_id)
     
     metaItems = re.findall('<meta\s+(?:itemprop|property)\s*=\s*"([^"]*)"\s*content\s*=\s*"([^"]*)"\s*\/>', html, re.DOTALL)
     meta = self.arrayToHash(metaItems)
