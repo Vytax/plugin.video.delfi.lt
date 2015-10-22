@@ -78,7 +78,6 @@ def build_media_list(mode, page):
     u = {}
     u['mode'] = 2
     u['mediaId'] = tv['id']
-    u['thumbnailURL'] = tv['thumbnailURL']
       
     xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?' + urllib.urlencode(u), listitem = listitem, isFolder = False, totalItems = 0)
   
@@ -113,7 +112,7 @@ def build_sporto_tv():
   xbmc.executebuiltin('Container.SetViewMode(515)')
   xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-def playVideo(mediaId, thumbnailURL):
+def playVideo(mediaId):
   
   data = delfi.getArticle(mediaId)
   
@@ -127,7 +126,7 @@ def playVideo(mediaId, thumbnailURL):
     
   listitem = xbmcgui.ListItem(label = data['title'])
   listitem.setPath(data['videoURL'])
-  listitem.setThumbnailImage(thumbnailURL)
+  listitem.setThumbnailImage(data['thumbnailUrl'])
   xbmcplugin.setResolvedUrl(handle = int(sys.argv[1]), succeeded = True, listitem = listitem)	
   
 
@@ -143,7 +142,6 @@ path = sys.argv[0]
 params = getParameters(sys.argv[2])
 mode = None
 url = None
-thumbnailURL = None
 mediaId = None
 page = None
 
@@ -157,11 +155,6 @@ try:
 except:
 	pass
       
-try:
-	thumbnailURL = urllib.unquote_plus(params["thumbnailURL"])
-except:
-	pass
-
 try:
 	mediaId = int(params["mediaId"])
 except:
@@ -177,7 +170,7 @@ if mode == None:
 elif mode in [1, 4]:
   build_media_list(mode, page)
 elif mode == 2:
-  playVideo(mediaId, thumbnailURL)
+  playVideo(mediaId)
 elif mode == 3:
   build_sporto_tv()
   

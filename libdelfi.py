@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 DELFI_TV = 'http://www.delfi.lt/'
 DELFI_TV_URL = DELFI_TV + 'video/'
 DELFI_TV_ARCHIVE = DELFI_TV_URL + 'archive/?fromd=%s&tod=%s&page=%d'
-DELFI_TV_ARTICLE = 'http://m.delfi.lt/video/article.php?id=%d'
+DELFI_TV_ARTICLE = 'http://www.delfi.lt/video/article.php?id=%d'
 DELFI_TV_SPORTAS = DELFI_TV_URL + 'sportas/?page=%d'
 
 reload(sys) 
@@ -114,6 +114,15 @@ class Delfi(object):
     result.update(pages)
     
     return result
+  
+  def arrayToHash(self, arr):
+    
+    result = {}
+    
+    for item in arr:
+      result[item[0]] = item[1]
+      
+    return result
 
   def getArticle(self, mid):
     
@@ -121,10 +130,7 @@ class Delfi(object):
     
     html = self.getURL(DELFI_TV_ARTICLE % mid)
     
-    data_id = re.findall('data-provider="dvideo" data-id="([^"]*)">', html, re.DOTALL)
-    data_title = re.findall('<h1>(.*?)<\/h1>', html, re.DOTALL)
-    data_published = re.findall('<div class="articleDateSource[^>]*>([^<]*)<\/div>', html, re.DOTALL)
-    data_description = re.findall('<p itemprop="description"[^>]*>(.*?)<\/p>', html, re.DOTALL)
+    data_id = re.findall('data-provider="dvideo" data-id="([^"]*)">', html, re.DOTALL)    
     
     if not data_id:
       err = re.findall('div class="time-overlay">(.*?)<\/div>', html, re.DOTALL)
@@ -138,21 +144,27 @@ class Delfi(object):
     result['data_id'] = data_id
     result['videoURL'] = 'http://g.dcdn.lt/vs/videos/%s/%s/v480.mp4' % (data_id [0],  data_id)
     
-    if data_description:
-      description = re.sub(r'<[^>]*?>', ' ', data_description[0])
-      result['plot'] = description.replace('\t','').strip()
+    metaItems = re.findall('<meta\s+(?:itemprop|property)\s*=\s*"([^"]*)"\s*content\s*=\s*"([^"]*)"\s*\/>', html, re.DOTALL)
+    meta = self.arrayToHash(metaItems)
+    print meta
+    
+    if 'description' in meta:
+      result['plot'] = meta['description'].replace('\t',' ').strip()
     else:
       result['plot'] = ''
       
-    if data_published:
-      result['aired'] = self.longDateToShort(data_published[0])
+    if 'datePublished' in meta:
+      result['aired'] = meta['datePublished'].split('T')[0].replace('-','.')
     else:
       result['aired'] = ''
       
-    if data_title:
-      result['title'] = data_title[0].replace('\t','').strip()
+    if 'name' in meta:
+      result['title'] = meta['name'].replace('\t','').strip()
     else:
       result['title'] = ''
+      
+    if 'thumbnailUrl' in meta:
+      result['thumbnailUrl'] = meta['thumbnailUrl']
 
     return result
 
@@ -183,36 +195,7 @@ class Delfi(object):
 	self._db.commit()
       
       return data
-
-  def longDateToShort(self, longDate):
-    
-    parts = re.findall('(\d+)\s*m.\s*([a-zA-Zžėščū]+)\s*(\d+)\s*d\.', longDate, re.UNICODE)
-    
-    if not parts:
-      return ''
-    
-    parts = parts[0]
-    
-    months = {
-      'sausio' : 1,
-      'vasario' : 2,
-      'kovo' : 3,
-      'balandžio': 4,
-      'gegužės' : 5,
-      'birželio': 6,
-      'liepos' : 7,
-      'rugpjūčio' : 8,
-      'rugsėjo' : 9,
-      'spalio' : 10,
-      'lapkričio' : 11,
-      'gruodžio' : 12     
-    }
-    
-    if not parts[1] in months:
-      return ''
-    
-    return parts[0] + '-' + str(months[parts[1]]).zfill(2) + '-' + parts[2].zfill(2)
-  
+ 
   def badVideo(self, mid):
     cursor = self._db.cursor()
     cursor.execute("REPLACE INTO badVideos (mid, accessTime) VALUES (?, DateTime('now'))", (mid,))
@@ -255,4 +238,4 @@ if __name__ == '__main__':
   
   delfi = Delfi('test.sql')
   
-  delfi.getLatestVideos(1)
+  print delfi.getArticle(69346534)
