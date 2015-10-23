@@ -10,9 +10,12 @@ import simplejson as json
 DELFI_TV = 'http://www.delfi.lt/'
 DELFI_TV_URL = DELFI_TV + 'video/'
 DELFI_TV_ARCHIVE = DELFI_TV_URL + 'archive/?fromd=%s&tod=%s&page=%d'
-DELFI_TV_ARTICLE = 'http://www.delfi.lt/video/article.php?id=%d'
+DELFI_TV_ARTICLE = DELFI_TV_URL + 'article.php?id=%d'
 DELFI_TV_SPORTAS = DELFI_TV_URL + 'sportas/?page=%d'
 DELFI_VIDEO_DATA = 'http://g.dcdn.lt/vfe/data.php?video_id=%s'
+DELFI_TV_LIVE_UPCOMING = DELFI_TV_URL + 'transliacijos/anonsai/?page=%d'
+DELFI_TV_LIVE_ARCHIVE = DELFI_TV_URL + 'transliacijos/archyvas/?page=%d'
+DELFI_TV_LIVE_24 = DELFI_TV_URL + 'transliacijos/24-val-transliacijos/'
 
 reload(sys) 
 sys.setdefaultencoding('utf8')
@@ -46,6 +49,18 @@ class Delfi(object):
   def getSportsTVReports(self, page):
     
     return self.getInfo(DELFI_TV_SPORTAS % page)
+  
+  def getLiveUpcoming(self, page):
+    
+    return self.getInfo(DELFI_TV_LIVE_UPCOMING % (page - 1))
+  
+  def getLiveArchive(self, page):
+    
+    return self.getInfo(DELFI_TV_LIVE_ARCHIVE % (page - 1))
+  
+  def getLiveArchive(self):
+    
+    return self.getInfo(DELFI_TV_LIVE_24)
   
   def getInfo(self, url):
   
@@ -110,7 +125,8 @@ class Delfi(object):
     result['data'] = videos
     
     pages = self.getPageCount(html)
-    result.update(pages)
+    if pages:
+      result.update(pages)
     
     return result
   
