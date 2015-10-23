@@ -104,21 +104,12 @@ class Delfi(object):
       else:
 	video['plot'] = ''
 	
-      pubtime = re.findall('<div class="headline-pubtime">(\d+) (val|d|min).</div>', item, re.DOTALL)
+      pubtime = re.findall('<div class="headline-pubtime">([^<]*)</div>', item, re.DOTALL)
+      
       if pubtime:
-	pubtime = pubtime[0]
-	t = datetime.now()
-	if pubtime[1] == 'd':
-	  t = t - timedelta(days=int(pubtime[0]))
-	elif pubtime[1] == 'val':
-	  t = t - timedelta(hours=int(pubtime[0]))
-	elif pubtime[1] == 'min':
-	  t = t - timedelta(minutes=int(pubtime[0]))
-	else:
-	  t = None
-	  
+	t = self.parseDate(pubtime[0])	  
 	if t:
-	  video['aired'] = t.strftime('%Y.%m.%d.')
+	  video['aired'] = t
       
       videos.append(video)
     
@@ -129,6 +120,50 @@ class Delfi(object):
       result.update(pages)
     
     return result
+  
+  def parseDate(self, dstr):
+    dstr = dstr.strip()
+    
+    pubtime = re.findall('^(?:prieš |)(\d+) (val|d|min).$', dstr)
+    if pubtime:
+      pubtime = pubtime[0]
+      t = datetime.now()
+      if pubtime[1] == 'd':
+	t = t - timedelta(days=int(pubtime[0]))
+      elif pubtime[1] == 'val':
+	t = t - timedelta(hours=int(pubtime[0]))
+      elif pubtime[1] == 'min':
+	t = t - timedelta(minutes=int(pubtime[0]))
+      else:
+	t = None
+	  
+      if t:
+	return t.strftime('%Y.%m.%d')
+	
+    pubtime = re.findall('^(\d+)\s*([a-zA-Zžėščū]+)\s*mėn\.\s*(\d+)\s*d\.\s*\d+:\d+$', dstr, re.UNICODE)
+
+    if pubtime:
+      pubtime = pubtime[0]
+
+      months = {
+	'sausio' : 1,
+	'vasario' : 2,
+	'kovo' : 3,
+	'balandžio': 4,
+	'gegužės' : 5,
+	'birželio': 6,
+	'liepos' : 7,
+	'rugpjūčio' : 8,
+	'rugsėjo' : 9,
+	'spalio' : 10,
+	'lapkričio' : 11,
+	'gruodžio' : 12     
+      }
+
+      if pubtime[1] in months:
+	return pubtime[0] + '.' + str(months[pubtime[1]]).zfill(2) + '.' + pubtime[2].zfill(2)
+    
+    return None
   
   def arrayToHash(self, arr):
     
@@ -239,6 +274,4 @@ class Delfi(object):
 
 if __name__ == '__main__':
   
-  delfi = Delfi()
-  
-  print delfi.getArticle(69336736)
+  delfi = Delfi()  
