@@ -34,6 +34,30 @@ def build_main_directory():
   listitem.setProperty('IsPlayable', 'false')
   xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=3', listitem = listitem, isFolder = True, totalItems = 0)
   
+  listitem = xbmcgui.ListItem("Žinios")
+  listitem.setProperty('IsPlayable', 'false')
+  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=7&page=1', listitem = listitem, isFolder = True, totalItems = 0)
+  
+  listitem = xbmcgui.ListItem("Aktualijos")
+  listitem.setProperty('IsPlayable', 'false')
+  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=8&page=1', listitem = listitem, isFolder = True, totalItems = 0)
+  
+  listitem = xbmcgui.ListItem("Verslas")
+  listitem.setProperty('IsPlayable', 'false')
+  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=9&page=1', listitem = listitem, isFolder = True, totalItems = 0)
+  
+  listitem = xbmcgui.ListItem("Mokslas ir gamta")
+  listitem.setProperty('IsPlayable', 'false')
+  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=10&page=1', listitem = listitem, isFolder = True, totalItems = 0)
+  
+  listitem = xbmcgui.ListItem("Auto")
+  listitem.setProperty('IsPlayable', 'false')
+  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=11&page=1', listitem = listitem, isFolder = True, totalItems = 0)
+  
+  listitem = xbmcgui.ListItem("Sportas")
+  listitem.setProperty('IsPlayable', 'false')
+  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=12&page=1', listitem = listitem, isFolder = True, totalItems = 0)
+  
   xbmcplugin.setContent(int( sys.argv[1] ), 'tvshows')
   xbmc.executebuiltin('Container.SetViewMode(515)')
   xbmcplugin.endOfDirectory(int(sys.argv[1]))
@@ -49,7 +73,19 @@ def build_media_list(mode, page):
   elif mode == 5:
     tvList = delfi.getLiveArchive(page)
   elif mode == 6:
-    tvList = delfi.getLiveArchive()
+    tvList = delfi.getLive24()
+  elif mode == 7:
+    tvList = delfi.getTVNews(page)
+  elif mode == 8:
+    tvList = delfi.getHotTopics(page)
+  elif mode == 9:
+    tvList = delfi.getBusiness(page)
+  elif mode == 10:
+    tvList = delfi.getScience(page)
+  elif mode == 11:
+    tvList = delfi.getAuto(page)
+  elif mode == 12:
+    tvList = delfi.getSportsTV(page)
   else:
     return
   
@@ -171,7 +207,7 @@ except:
 
 if mode == None:
   build_main_directory()
-elif mode in [1, 4, 5, 6]:
+elif mode in [1, 4, 5, 6, 7, 8, 9, 10, 11, 12]:
   build_media_list(mode, page)
 elif mode == 2:
   playVideo(mediaId)
