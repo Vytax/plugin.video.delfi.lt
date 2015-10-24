@@ -211,6 +211,20 @@ class Delfi(object):
       if url.startswith('//'):
 	url = 'http:' + url
       result['videoURL'] = url
+      
+    elif 'versions' in response:
+	versions = response['versions']
+	
+	version = None
+	if 'HD' in versions:
+	  version = versions['HD']
+	elif 'SD' in versions:
+	  version = versions['HD']
+	  
+	if version:
+	  for video in version:
+	    if video['type'] == 'application/x-mpegurl':
+	      result['videoURL'] = video['src']
     
     return result
 
