@@ -16,6 +16,7 @@ DELFI_TV_LIVE_UPCOMING = DELFI_TV_URL + 'transliacijos/anonsai/?page=%d'
 DELFI_TV_LIVE_ARCHIVE = DELFI_TV_URL + 'transliacijos/archyvas/?page=%d'
 DELFI_TV_LIVE_24 = DELFI_TV_URL + 'transliacijos/24-val-transliacijos/'
 DELFI_TV_CHANNEL = DELFI_TV_URL + '%s/?page=%d'
+DELFI_TV_SEARCH = DELFI_TV_URL + 'archive/?fromd=00.00.0000&tod=%s&query=%s&page=%d'
 
 reload(sys) 
 sys.setdefaultencoding('utf8')
@@ -61,6 +62,12 @@ class Delfi(object):
   def getChannel(self, page, channel):
     
     return self.getInfo(DELFI_TV_CHANNEL % (channel, page))
+  
+  def search(self, page, key):
+    
+    key = urllib.quote_plus(key.strip())    
+    tod = datetime.now().strftime('%d.%m.%Y')
+    return self.getInfo(DELFI_TV_SEARCH % (tod, key, page))
   
   def getInfo(self, url):
   

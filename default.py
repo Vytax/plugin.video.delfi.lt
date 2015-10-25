@@ -74,6 +74,10 @@ def build_main_directory():
   listitem.setProperty('IsPlayable', 'false')
   xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=16&page=1', listitem = listitem, isFolder = True, totalItems = 0)
   
+  listitem = xbmcgui.ListItem("Paieška")
+  listitem.setProperty('IsPlayable', 'false')
+  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=10&page=1', listitem = listitem, isFolder = True, totalItems = 0)
+  
   xbmcplugin.setContent(int( sys.argv[1] ), 'tvshows')
   xbmc.executebuiltin('Container.SetViewMode(515)')
   xbmcplugin.endOfDirectory(int(sys.argv[1]))
@@ -90,6 +94,11 @@ def build_media_list(mode, page, channel):
     tvList = delfi.getLiveArchive(page)
   elif mode == 6:
     tvList = delfi.getLive24()
+  elif mode == 10:
+    if not channel:
+      dialog = xbmcgui.Dialog()
+      channel = dialog.input('Vaizdo įrašo paieška', type=xbmcgui.INPUT_ALPHANUM)
+    tvList = delfi.search(page, channel)
   elif mode == 100:
     tvList = delfi.getChannel(page, channel)
   else:
@@ -138,7 +147,7 @@ def build_media_list(mode, page, channel):
       u = {}
       u['mode'] = mode
       u['page'] = page + 1
-      if mode == 100:
+      if mode in [10, 100]:
 	u['channel'] = channel
       
       xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?' + urllib.urlencode(u), listitem = listitem, isFolder = True, totalItems = 0)
@@ -313,7 +322,7 @@ except:
 
 if mode == None:
   build_main_directory()
-elif mode in [1, 4, 5, 6, 100]:
+elif mode in [1, 4, 5, 6, 10, 100]:
   build_media_list(mode, page, channel)
 elif mode == 2:
   playVideo(mediaId)
@@ -321,3 +330,4 @@ elif mode == 3:
   build_live()
 elif mode == 16:
   build_tv_shows_list()
+  
