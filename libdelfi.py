@@ -11,16 +11,11 @@ DELFI_TV = 'http://www.delfi.lt/'
 DELFI_TV_URL = DELFI_TV + 'video/'
 DELFI_TV_ARCHIVE = DELFI_TV_URL + 'archive/?fromd=%s&tod=%s&page=%d'
 DELFI_TV_ARTICLE = DELFI_TV_URL + 'article.php?id=%d'
-DELFI_TV_SPORTAS = DELFI_TV_URL + 'sportas/?page=%d'
 DELFI_VIDEO_DATA = 'http://g.dcdn.lt/vfe/data.php?video_id=%s'
 DELFI_TV_LIVE_UPCOMING = DELFI_TV_URL + 'transliacijos/anonsai/?page=%d'
 DELFI_TV_LIVE_ARCHIVE = DELFI_TV_URL + 'transliacijos/archyvas/?page=%d'
 DELFI_TV_LIVE_24 = DELFI_TV_URL + 'transliacijos/24-val-transliacijos/'
-DELFI_TV_NEWS = DELFI_TV_URL + 'laidos/120s/?page=%d'
-DELFI_TV_HOT_TOPICS = DELFI_TV_URL + 'aktualijos/?page=%d'
-DELFI_TV_BUSINESS = DELFI_TV_URL + 'verslas/?page=%d'
-DELFI_TV_SCIENCE = DELFI_TV_URL + 'mokslas-ir-gamta/?page=%d'
-DELFI_TV_AUTO = DELFI_TV_URL + 'auto/?page=%d'
+DELFI_TV_CHANNEL = DELFI_TV_URL + '%s/?page=%d'
 
 reload(sys) 
 sys.setdefaultencoding('utf8')
@@ -51,10 +46,6 @@ class Delfi(object):
     
     return self.getInfo(url)
   
-  def getSportsTV(self, page):
-    
-    return self.getInfo(DELFI_TV_SPORTAS % page)
-  
   def getLiveUpcoming(self, page):
     
     return self.getInfo(DELFI_TV_LIVE_UPCOMING % (page - 1))
@@ -67,25 +58,9 @@ class Delfi(object):
     
     return self.getInfo(DELFI_TV_LIVE_24)
   
-  def getTVNews(self, page):
+  def getChannel(self, page, channel):
     
-    return self.getInfo(DELFI_TV_NEWS % page)
-  
-  def getHotTopics(self, page):
-    
-    return self.getInfo(DELFI_TV_HOT_TOPICS % page)
-
-  def getBusiness(self, page):
-    
-    return self.getInfo(DELFI_TV_BUSINESS % page)
-  
-  def getScience(self, page):
-    
-    return self.getInfo(DELFI_TV_SCIENCE % page)
-  
-  def getAuto(self, page):
-    
-    return self.getInfo(DELFI_TV_AUTO % page)
+    return self.getInfo(DELFI_TV_CHANNEL % (channel, page))
   
   def getInfo(self, url):
   
