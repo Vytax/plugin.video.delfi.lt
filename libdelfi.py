@@ -291,7 +291,20 @@ class Delfi(object):
     pageCount = int(pages[-1][1])  
     return { 'currentPage' : currentPage, 'pageCount' : pageCount }
     
-   
+  def getPosters(self):
+    
+    html = self.getURL(DELFI_TV_URL)
+    
+    cover = re.findall('<div id="cover".*?data-image="([^"]+)"', html, re.DOTALL)
+    posters = re.findall('<div class="level-2-item "><a href="http:\/\/www\.delfi\.lt\/video\/([^"]+)".*?url\(([^\)]+)\)', html, re.DOTALL)
+    
+    result = {}
+    if posters:
+      result = self.arrayToHash(posters)
+    if cover:
+      result['cover'] = cover[0]
+
+    return result
 
 if __name__ == '__main__':
   

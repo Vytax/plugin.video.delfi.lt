@@ -10,6 +10,7 @@ import xbmcplugin
 import xbmcaddon
 
 from libdelfi import Delfi
+import time
 
 settings = xbmcaddon.Addon(id='plugin.video.delfi.lt')
 
@@ -24,59 +25,35 @@ def getParameters(parameterString):
       commands[key] = value
   return commands
 
+def addListItem(title, url, thumb=None):
+  
+  cover = settings.getSetting('cover')
+  
+  listitem = xbmcgui.ListItem(title)
+  listitem.setProperty('IsPlayable', 'false')
+  if cover:
+    listitem.setProperty('fanart_image', cover)
+  if thumb:
+    img = settings.getSetting(thumb)
+    if img:
+      listitem.setThumbnailImage(img)
+  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + url, listitem = listitem, isFolder = True, totalItems = 0)
+
 def build_main_directory(): 
   
-  listitem = xbmcgui.ListItem("Naujausi įrašai")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=1&page=1', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Transliacijos")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=3', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Žinios")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2F120s', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Aktualijos")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=aktualijos', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Verslas")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=verslas', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Mokslas ir gamta")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=mokslas-ir-gamta', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Auto")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=auto', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Sportas")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=sportas', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Pramogos")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=pramogos', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Sveikatos TV")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=sveikata-tv', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Stilius")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=stilius', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Laidos")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=16&page=1', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Paieška")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=10&page=1', listitem = listitem, isFolder = True, totalItems = 0)
+  addListItem('Naujausi įrašai', '?mode=1&page=1')
+  addListItem('Transliacijos', '?mode=3')
+  addListItem('Žinios', '?mode=100&page=1&channel=laidos%2F120s', 'laidos/120s')
+  addListItem('Aktualijos', '?mode=100&page=1&channel=aktualijos', 'aktualijos')
+  addListItem('Verslas', '?mode=100&page=1&channel=verslas', 'verslas')
+  addListItem('Mokslas ir gamta', '?mode=100&page=1&channel=mokslas-ir-gamta', 'mokslas-ir-gamta')
+  addListItem('Auto', '?mode=100&page=1&channel=auto', 'auto')
+  addListItem('Sportas', '?mode=100&page=1&channel=sportas', 'sportas')
+  addListItem('Pramogos', '?mode=100&page=1&channel=pramogos', 'pramogos')
+  addListItem('Sveikatos TV', '?mode=100&page=1&channel=sveikata-tv', 'sveikata-tv')
+  addListItem('Stilius', '?mode=100&page=1&channel=stilius', 'stilius') 
+  addListItem('Laidos', '?mode=16&page=1')
+  addListItem('Paieška', '?mode=10&page=1')
   
   xbmcplugin.setContent(int( sys.argv[1] ), 'tvshows')
   xbmc.executebuiltin('Container.SetViewMode(515)')
@@ -158,108 +135,38 @@ def build_media_list(mode, page, channel):
 
 def build_live():
   
-  listitem = xbmcgui.ListItem("Anonsai")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=4&page=1', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Archyvas")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=5&page=1', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("24 val. transliacijos")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=6', listitem = listitem, isFolder = True, totalItems = 0)
-  
+  addListItem('Anonsai', '?mode=4&page=1', 'transliacijos/anonsai')
+  addListItem('Archyvas', '?mode=5&page=1')
+  addListItem('24 val. transliacijos', '?mode=6', 'transliacijos/24-val-transliacijos')
+
   xbmcplugin.setContent(int( sys.argv[1] ), 'tvshows')
   xbmc.executebuiltin('Container.SetViewMode(515)')
   xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def build_tv_shows_list():
   
-  listitem = xbmcgui.ListItem("120s")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2F120s', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Pinigų karta")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fpinigu-karta', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Mokslo ekspresas")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fmokslo-ekspresas', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Mano pergalės kelias")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fmano-pergales-kelias', listitem = listitem, isFolder = True, totalItems = 0)
-  
-  listitem = xbmcgui.ListItem("Kitas kampas")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fkitas-kampas', listitem = listitem, isFolder = True, totalItems = 0)
+  addListItem('120s', '?mode=100&page=1&channel=laidos%2F120s', 'laidos/120s')
+  addListItem('Pinigų karta', '?mode=100&page=1&channel=laidos%2Fpinigu-karta', 'laidos/pinigu-karta')
+  addListItem('Mokslo ekspresas', '?mode=100&page=1&channel=laidos%2Fmokslo-ekspresas', 'laidos/mokslo-ekspresas')
+  addListItem('Mano pergalės kelias', '?mode=100&page=1&channel=laidos%2Fmano-pergales-kelias', 'laidos/mano-pergales-kelias')
+  addListItem('Kitas kampas', '?mode=100&page=1&channel=laidos%2Fkitas-kampas', 'laidos/kitas-kampas')
+  addListItem('Boso valanda su S. Jovaišu', '?mode=100&page=1&channel=laidos%2Fboso-valanda-su-s-jovaisu', 'laidos/boso-valanda-su-s-jovaisu')
+  addListItem('Grynas TV', '?mode=100&page=1&channel=laidos%2Fgrynas-tv', 'laidos/grynas-tv')
+  addListItem('Pumpurėliai', '?mode=100&page=1&channel=laidos%2Fpumpureliai', 'laidos/pumpureliai')
+  addListItem('1000receptų TV', '?mode=100&page=1&channel=laidos%2F1000-receptu-tv', 'laidos/1000-receptu-tv')
+  addListItem('Mano namai TV', '?mode=100&page=1&channel=laidos%2Fmanonamai-tv', 'laidos/manonamai-tv')
+  addListItem('Žinios rusų kalba', '?mode=100&page=1&channel=laidos%2Fzinios-rusu-kalba', 'laidos/zinios-rusu-kalba')
+  addListItem('Dokumentika', '?mode=100&page=1&channel=laidos%2Fdokumentika', 'laidos/dokumentika')
+  addListItem('Žinios anglų kalba', '?mode=100&page=1&channel=laidos%2Fzinios-anglu-kalba', 'laidos/zinios-anglu-kalba')
+  addListItem('Balsuok', '?mode=100&page=1&channel=laidos%2Fbalsuok', 'laidos/balsuok')
+  addListItem('LOGIN', '?mode=100&page=1&channel=laidos%2Flogin', 'laidos/login')
+  addListItem('Judėk', '?mode=100&page=1&channel=laidos%2Fjudek', 'laidos/judek')
+  addListItem('Radistai', '?mode=100&page=1&channel=laidos%2Fradistai', 'laidos/radistai')
+  addListItem('Anekdotai', '?mode=100&page=1&channel=laidos%2Fanekdotai', 'laidos/anekdotai')
+  addListItem('Karybos menas', '?mode=100&page=1&channel=laidos%2Fkarybos-menas', 'laidos/karybos-menas')
+  addListItem('Trumpo metro filmai', '?mode=100&page=1&channel=laidos%2Ftrumpo-metro-filmai', 'laidos/trumpo-metro-filmai')
+  addListItem('Animacija', '?mode=100&page=1&channel=laidos%2Fanimacija', 'laidos/animacija')
 
-  listitem = xbmcgui.ListItem("Boso valanda su S. Jovaišu")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fboso-valanda-su-s-jovaisu', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("Grynas TV")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fgrynas-tv', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("Pumpurėliai")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fpumpureliai', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("1000receptų TV")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2F1000-receptu-tv', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("Mano namai TV")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fmanonamai-tv', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("Žinios rusų kalba")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fzinios-rusu-kalba', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("Dokumentika")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fdokumentika', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("Žinios anglų kalba")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fzinios-anglu-kalba', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("Balsuok")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fbalsuok', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("LOGIN")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Flogin', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("Judėk")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fjudek', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("Radistai")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fradistai', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("Anekdotai")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fanekdotai', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("Karybos menas")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fkarybos-menas', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("Trumpo metro filmai")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Ftrumpo-metro-filmai', listitem = listitem, isFolder = True, totalItems = 0)
-
-  listitem = xbmcgui.ListItem("Animacija")
-  listitem.setProperty('IsPlayable', 'false')
-  xbmcplugin.addDirectoryItem(handle = int(sys.argv[1]), url = sys.argv[0] + '?mode=100&page=1&channel=laidos%2Fanimacija', listitem = listitem, isFolder = True, totalItems = 0)
-  
   xbmcplugin.setContent(int( sys.argv[1] ), 'tvshows')
   xbmc.executebuiltin('Container.SetViewMode(515)')
   xbmcplugin.endOfDirectory(int(sys.argv[1]))
@@ -281,7 +188,23 @@ def playVideo(mediaId):
   if 'thumbnailUrl' in data:
     listitem.setThumbnailImage(data['thumbnailUrl'])
   xbmcplugin.setResolvedUrl(handle = int(sys.argv[1]), succeeded = True, listitem = listitem)	
+
+def setupPosters():
   
+  postersUpdate = settings.getSetting('postersUpdate')
+  if postersUpdate:
+    
+    if (int(time.time()) - 60*60*24*7) < int(postersUpdate):
+      return
+  
+  posters = delfi.getPosters()
+  if not posters:
+    return  
+    
+  posters['postersUpdate'] = str(int(time.time()))
+  
+  for key, value in posters.iteritems():
+    settings.setSetting(key, value)
 
 # **************** main ****************
 
@@ -319,6 +242,8 @@ try:
 	channel = urllib.unquote_plus(params["channel"])
 except:
 	pass
+
+setupPosters()
 
 if mode == None:
   build_main_directory()
