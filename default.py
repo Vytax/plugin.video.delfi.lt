@@ -75,7 +75,8 @@ def build_media_list(mode, page, channel):
     if not channel:
       dialog = xbmcgui.Dialog()
       channel = dialog.input('Vaizdo įrašo paieška', type=xbmcgui.INPUT_ALPHANUM)
-    tvList = delfi.search(page, channel)
+    if channel:
+      tvList = delfi.search(page, channel)
   elif mode == 100:
     tvList = delfi.getChannel(page, channel)
   else:
