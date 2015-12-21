@@ -86,7 +86,7 @@ class Delfi(object):
       
       video = {}
       
-      thumb = re.findall('<img class="img-responsive" src="([^"]*)"', item, re.DOTALL)
+      thumb = re.findall('<img class="img-responsive"[^<>]*data-src2x="([^"]*)"', item, re.DOTALL)
       if thumb:	    
 	video['thumbnailURL'] = thumb[0]
       else:
